@@ -38,23 +38,7 @@ namespace RetailerAPI.Controllers
         [HttpPost]
         public ActionResult<double> Post(JObject trolley)
         {
-            // Validate schema
-            if (IsNull(trolley["products"]) || IsNull(trolley["specials"]) || IsNull(trolley["quantities"]))
-            {
-                throw new ArgumentException("Missing mandatory fields products, specials or quantities.");
-            }
-
             return this.resourceService.GetMinimumTotal(trolley);
-        }
-
-        /// <summary>
-        /// Helper method to validate if a JToken is null.
-        /// </summary>
-        /// <param name="jToken">JToken to be validated.</param>
-        /// <returns>Bool indicating if the token is null.</returns>
-        private bool IsNull(JToken jToken)
-        {
-            return jToken == null;
         }
     }
 }

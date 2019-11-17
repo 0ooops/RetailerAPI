@@ -9,21 +9,6 @@ namespace RetailerAPI.Controllers.Tests
     public class TrolleyTotalControllerTest
     {
         [Test]
-        public void TestCalculateTrolleyTotalWithInvalidJObject()
-        {
-            // Prepare
-            JObject testObject = new JObject();
-
-            // Set up behavior
-            Mock<IResourceService> resourceService = new Mock<IResourceService>();
-
-            // Call method and assert
-            TrolleyTotalController trolleyController =
-                new TrolleyTotalController(resourceService.Object);
-            Assert.Throws<ArgumentException>(() => trolleyController.Post(testObject));
-        }
-
-        [Test]
         public void TestCalculateTrolleyTotalWithValidJObject()
         {
             // Prepare
@@ -33,7 +18,7 @@ namespace RetailerAPI.Controllers.Tests
                 'products': [
                 {
                     'name': 'string',
-                    'price': 0
+                    'price': 3
                 }
                 ],
                 'specials': [
@@ -41,16 +26,16 @@ namespace RetailerAPI.Controllers.Tests
                     'quantities': [
                     {
                         'name': 'string',
-                        'quantity': 0
+                        'quantity': 1
                     }
                     ],
-                    'total': 0
+                    'total': 1.4
                 }
                 ],
                 'quantities': [
                 {
                     'name': 'string',
-                    'quantity': 0
+                    'quantity': 2
                 }
                 ]
             }";

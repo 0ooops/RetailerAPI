@@ -21,7 +21,9 @@ namespace RetailerAPI.Services
         private readonly HttpClient httpClient;
         private readonly IUserToken userToken;
 
-        public ResourceService(IHttpClientFactory clientFactory, IOptions<UserToken> userTokenOption)
+        public ResourceService(
+            IHttpClientFactory clientFactory,
+            IOptions<UserToken> userTokenOption)
         {
             this.httpClient = clientFactory.CreateClient();
             this.userToken = userTokenOption.Value;
@@ -37,8 +39,10 @@ namespace RetailerAPI.Services
         /// </remarks>
         public List<IProduct> GetProducts()
         {
-            string productUrl = "http://dev-wooliesx-recruitment.azurewebsites.net/api/resource/products";
-            string responseContent = this.HttpGetHelper(this.GetUrlWithParamToken(productUrl)).Result;
+            string productUrl =
+                "http://dev-wooliesx-recruitment.azurewebsites.net/api/resource/products";
+            string responseContent =
+                this.HttpGetHelper(this.GetUrlWithParamToken(productUrl)).Result;
 
             try
             {
@@ -59,8 +63,10 @@ namespace RetailerAPI.Services
         /// <returns>List of shopper histories.</returns>
         public List<IShopperHistory<IProduct>> GetShopperHistories()
         {
-            string shopperHistoryUrl = "http://dev-wooliesx-recruitment.azurewebsites.net/api/resource/shopperHistory";
-            string responseContent = this.HttpGetHelper(this.GetUrlWithParamToken(shopperHistoryUrl)).Result;
+            string shopperHistoryUrl =
+                "http://dev-wooliesx-recruitment.azurewebsites.net/api/resource/shopperHistory";
+            string responseContent =
+                this.HttpGetHelper(this.GetUrlWithParamToken(shopperHistoryUrl)).Result;
 
             try
             {
@@ -68,7 +74,8 @@ namespace RetailerAPI.Services
                     JsonConvert.DeserializeObject<List<ShopperHistory<Product>>>(responseContent);
 
                 // Cast shopper histories from List<ShopperHistory<Product>> to List<IShopperHistory<IProduct>>
-                List<IShopperHistory<IProduct>> newHistories = new List<IShopperHistory<IProduct>>();
+                List<IShopperHistory<IProduct>> newHistories =
+                    new List<IShopperHistory<IProduct>>();
                 foreach (ShopperHistory<Product> shopper in shopperHistories)
                 {
                     List<IProduct> products = shopper.Products.ConvertAll(p => (IProduct)p);
@@ -91,10 +98,15 @@ namespace RetailerAPI.Services
         /// <returns>Minimum total price in double.</returns>
         public double GetMinimumTotal(JObject trolley)
         {
-            string trolleyTotalUrl = "http://dev-wooliesx-recruitment.azurewebsites.net/api/resource/trolleyCalculator";
-            var byteContent = new ByteArrayContent(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(trolley)));
+            string trolleyTotalUrl =
+                "http://dev-wooliesx-recruitment.azurewebsites.net/api/resource/trolleyCalculator";
+
+            // Encode trolley content as request body
+            var byteContent = new ByteArrayContent(
+                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(trolley)));
             byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            string responseContent = this.HttpPostHelper(this.GetUrlWithParamToken(trolleyTotalUrl), byteContent).Result;
+            string responseContent = this.HttpPostHelper(
+                this.GetUrlWithParamToken(trolleyTotalUrl), byteContent).Result;
 
             double result;
             if (double.TryParse(responseContent, out result))

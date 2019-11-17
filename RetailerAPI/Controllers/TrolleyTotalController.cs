@@ -1,21 +1,48 @@
 ﻿using System;
-using System.Net.Http;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using RetailerAPI.Models;
+using Newtonsoft.Json.Schema;
 using RetailerAPI.Services;
 
 namespace RetailerAPI.Controllers
 {
     /// <summary>
-    /// TrolleyTotalController handles all requests related to trolley total calculation.
+    /// TrolleyTotalController handles all requests related to
+    /// trolley total calculation.
     /// </summary>
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class TrolleyTotalController : ControllerBase
     {
         private readonly IResourceService resourceService;
+        private const string TrolleySchemaStr = @"
+            {
+                'products': [
+                {
+                    'name': 'string',
+                    'price': 0
+                }
+                ],
+                'specials': [
+                {
+                    'quantities': [
+                    {
+                        'name': 'string',
+                        'quantity': 0
+                    }
+                    ],
+                    'total': 0
+                }
+                ],
+                'quantities': [
+                {
+                    'name': 'string',
+                    'quantity': 0
+                }
+                ]
+            }";
 
         /// <summary>
         /// Initialize TrolleyTotal controller and inject resource service.
@@ -31,33 +58,23 @@ namespace RetailerAPI.Controllers
         /// <summary>
         /// Post /TrolleyTotal will return minimum price to purchase the products.
         /// </summary>
-        /// <param name="trolley">A JObject contains list of products, specials, quantities.</param>
+        /// <param name="trolley">
+        /// A JObject contains list of products, specials, quantities.</param>
         /// <returns>A lowest possible total price.</returns>
         [HttpPost]
         public ActionResult<double> Post(JObject trolley)
         {
-            if (!IsValidTrolleyJson(trolley))
-            {
-                throw new ArgumentException(
-                    "Required keys products, specials, quantities are not all presented.");
-            }
-            return this.resourceService.GetMinimumTotal(trolley);
-        }
+            
+            JsonSchema schema = JsonSchema.Parse(TrolleySchemaStr);
 
-        /// <summary>
-        /// Quick validation to check if trolley object is of right structure.
-        /// </summary>
-        /// <param name="trolley">JObject represents a trolley.</param>
-        /// <returns>If the JObject is of right structure.</returns>
-        private bool IsValidTrolleyJson(JObject trolley)
-        {
-            if (!trolley.ContainsKey("products")
-                || !trolley.ContainsKey("specials")
-                || !trolley.ContainsKey("quantities"))
+            // Check schema.
+            if (!trolley.IsValid(schema, out IList<string> messages))
             {
-                return false;
+                string errorMessage = string.Join(": ", messages.ToArray());
+                throw new ArgumentException(errorMessage);
             }
-            return true;
+
+            return this.resourceService.GetMinimumTotal(trolley);
         }
     }
 }

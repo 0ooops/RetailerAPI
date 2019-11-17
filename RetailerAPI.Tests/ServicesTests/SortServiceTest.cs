@@ -1,9 +1,7 @@
-using Microsoft.Extensions.Options;
-using Moq;
+using System.Collections.Generic;
 using NUnit.Framework;
 using RetailerAPI.Models;
 using RetailerAPI.Services;
-using System.Collections.Generic;
 
 namespace RetailerAPI.Controllers.Tests
 {
@@ -140,7 +138,7 @@ namespace RetailerAPI.Controllers.Tests
             };
 
             // Call method
-            Dictionary<string, int> popDict = new Dictionary<string, int>
+            Dictionary<string, double> popDict = new Dictionary<string, double>
             {
                 { product2.Name, 300 },
                 { product3.Name, 200 },
@@ -157,13 +155,13 @@ namespace RetailerAPI.Controllers.Tests
         public void TestCalculatePopularityFromShopperHistory()
         {
             // Input and expected output
-            List<IShopperHistory> shopperHistories = new List<IShopperHistory>
+            List<IShopperHistory<IProduct>> shopperHistories = new List<IShopperHistory<IProduct>>
             {
-                new ShopperHistory { Products = this.beforeSorting },
-                new ShopperHistory { Products = this.beforeSorting },
-                new ShopperHistory { Products = this.beforeSorting }
+                new ShopperHistory<IProduct> { Products = this.beforeSorting },
+                new ShopperHistory<IProduct> { Products = this.beforeSorting },
+                new ShopperHistory<IProduct> { Products = this.beforeSorting }
             };
-            Dictionary<string, int> popDict = new Dictionary<string, int>
+            Dictionary<string, double> popDict = new Dictionary<string, double>
             {
                 { product1.Name, product1.Quantity * 3 },
                 { product2.Name, product2.Quantity * 3 },
@@ -171,7 +169,7 @@ namespace RetailerAPI.Controllers.Tests
             };
 
             // Call method
-            Dictionary<string, int> result =
+            Dictionary<string, double> result =
                 this.sortingService.CalculatePopularityFromShopperHistory(shopperHistories);
 
             // Assert

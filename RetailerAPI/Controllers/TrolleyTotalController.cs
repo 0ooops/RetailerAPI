@@ -17,32 +17,6 @@ namespace RetailerAPI.Controllers
     public class TrolleyTotalController : ControllerBase
     {
         private readonly IResourceService resourceService;
-        private const string TrolleySchemaStr = @"
-            {
-                'products': [
-                {
-                    'name': 'string',
-                    'price': 0
-                }
-                ],
-                'specials': [
-                {
-                    'quantities': [
-                    {
-                        'name': 'string',
-                        'quantity': 0
-                    }
-                    ],
-                    'total': 0
-                }
-                ],
-                'quantities': [
-                {
-                    'name': 'string',
-                    'quantity': 0
-                }
-                ]
-            }";
 
         /// <summary>
         /// Initialize TrolleyTotal controller and inject resource service.
@@ -64,17 +38,23 @@ namespace RetailerAPI.Controllers
         [HttpPost]
         public ActionResult<double> Post(JObject trolley)
         {
-            
-            JsonSchema schema = JsonSchema.Parse(TrolleySchemaStr);
-
-            // Check schema.
-            if (!trolley.IsValid(schema, out IList<string> messages))
+            // Validate schema
+            if (IsNull(trolley["products"]) || IsNull(trolley["specials"]) || IsNull(trolley["quantities"]))
             {
-                string errorMessage = string.Join(": ", messages.ToArray());
-                throw new ArgumentException(errorMessage);
+                throw new ArgumentException("Missing mandatory fields products, specials or quantities.");
             }
 
             return this.resourceService.GetMinimumTotal(trolley);
+        }
+
+        /// <summary>
+        /// Helper method to validate if a JToken is null.
+        /// </summary>
+        /// <param name="jToken">JToken to be validated.</param>
+        /// <returns>Bool indicating if the token is null.</returns>
+        private bool IsNull(JToken jToken)
+        {
+            return jToken == null;
         }
     }
 }

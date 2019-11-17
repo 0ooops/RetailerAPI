@@ -6,7 +6,6 @@ using RetailerAPI.Services;
 
 namespace RetailerAPI.Controllers
 {
-    /// TODO: Write unit tests for this controller
     /// <summary>
     /// SortController will be used to handle requests related to sort
     /// products in different way.
